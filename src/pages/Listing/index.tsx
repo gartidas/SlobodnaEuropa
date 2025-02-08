@@ -1,20 +1,11 @@
-import * as React from "react";
-import { fetchArticlesStart } from "../../store/articlesSlice";
-import { useAppSelector } from "../../store";
+import DefaultLayout from "../../sharedComponents/molecules/DefaultLayout";
+import ListingTemplate from "../../sharedComponents/templates/Listing";
 
 const Listing = () => {
-  const articles = useAppSelector((state) => state.articlesState.articles);
-
-  React.useEffect(() => {
-    fetchArticlesStart();
-  }, []);
-
   return (
-    <div>
-      {articles.map((article) => (
-        <div key={article.id}>{article.title}</div>
-      ))}
-    </div>
+    <DefaultLayout>
+      <ListingTemplate />
+    </DefaultLayout>
   );
 };
 

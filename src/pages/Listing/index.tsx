@@ -1,7 +1,7 @@
 import DefaultLayout from "../../sharedComponents/molecules/DefaultLayout";
 import ListingTemplate from "../../sharedComponents/templates/Listing";
 
-const Listing = () => {
+const ArticleListing = () => {
   return (
     <DefaultLayout>
       <ListingTemplate />
@@ -9,4 +9,4 @@ const Listing = () => {
   );
 };
 
-export default Listing;
+export default ArticleListing;

@@ -5,12 +5,14 @@ import { getRandomDate } from "../utils";
 
 interface IArticlesState {
   articles: IArticle[];
+  selectedArticle: IArticle | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: IArticlesState = {
   articles: [],
+  selectedArticle: null,
   loading: false,
   error: null,
 };
@@ -48,6 +50,28 @@ export const fetchArticles = createAsyncThunk<IArticle[], void>(
   }
 );
 
+export const fetchArticleById = createAsyncThunk<IArticle, string>(
+  "articles/fetchArticleById",
+  async (articleId) => {
+    const postResponse = await axios.get(
+      `https://jsonplaceholder.typicode.com/posts/${articleId}`
+    );
+    const post = postResponse.data;
+
+    const userResponse = await axios.get(
+      `https://jsonplaceholder.typicode.com/users/${post.userId}`
+    );
+
+    return {
+      id: post.id.toString(),
+      author: userResponse.data.name || undefined,
+      title: post.title,
+      publicationDate: getRandomDate(),
+      content: post.body,
+    };
+  }
+);
+
 export const articlesSlice = createSlice({
   name: "articles",
   initialState,
@@ -70,21 +94,39 @@ export const articlesSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchArticles.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(
-      fetchArticles.fulfilled,
-      (state, action: PayloadAction<IArticle[]>) => {
+    builder
+      .addCase(fetchArticles.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        fetchArticles.fulfilled,
+        (state, action: PayloadAction<IArticle[]>) => {
+          state.loading = false;
+          state.articles = action.payload;
+        }
+      )
+      .addCase(fetchArticles.rejected, (state, action) => {
         state.loading = false;
-        state.articles = action.payload;
-      }
-    );
-    builder.addCase(fetchArticles.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message ?? null;
-    });
+        state.error = action.error.message ?? null;
+      })
+      .addCase(fetchArticleById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.selectedArticle = null;
+      })
+      .addCase(
+        fetchArticleById.fulfilled,
+        (state, action: PayloadAction<IArticle>) => {
+          state.loading = false;
+          state.selectedArticle = action.payload;
+        }
+      )
+      .addCase(fetchArticleById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? null;
+        state.selectedArticle = null;
+      });
   },
 });
 

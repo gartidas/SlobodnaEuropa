@@ -1,11 +1,14 @@
 import { Paper, Stack, Typography } from "@mui/material";
 import { IArticle } from "../../../model";
+import { useNavigate } from "react-router";
 
 interface IArticleProps {
   article: IArticle;
 }
 
 const Article = ({ article }: IArticleProps) => {
+  const navigate = useNavigate();
+
   return (
     <Paper
       elevation={3}
@@ -23,6 +26,7 @@ const Article = ({ article }: IArticleProps) => {
           boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)",
         },
       }}
+      onClick={() => navigate(`/articles/${article.id}`)}
     >
       <Stack spacing="0.75rem">
         <Typography variant="subtitle2" color="text.secondary">

@@ -47,7 +47,13 @@ const Navbar = ({ onMenuOpen }: INavbarProps) => {
         height: `${NAVBAR_HEIGHT}px`,
       }}
     >
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+      <Toolbar
+        sx={{
+          display: "flex",
+          padding: "0 !important",
+          justifyContent: "space-between",
+        }}
+      >
         <Typography
           variant="h6"
           sx={{

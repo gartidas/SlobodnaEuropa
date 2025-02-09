@@ -4,7 +4,7 @@
 
 https://material-ui.com/components/timeline/
 
-### Tech stack:
+## Tech stack:
 
 - React
 - TypeScript
@@ -12,15 +12,15 @@ https://material-ui.com/components/timeline/
 - Material UI
 - React Router
 
-### Assignment:
+## Assignment:
 
-#### Test Assignment: Mini-CMS for Article Management
+### Test Assignment: Mini-CMS for Article Management
 
-##### Task:
+#### Task:
 
 Develop a single-page application for managing articles, including listing articles, creating new ones, editing, deleting existing ones.
 
-##### Requirements:
+#### Requirements:
 
 1. Functionality:
 
@@ -37,7 +37,7 @@ Develop a single-page application for managing articles, including listing artic
 - User Experience: Show loading indicators during API calls.
 - Unit Testing: Write unit tests for core components using Jest and React Testing Library. Focus on testing component behavior, data flow, and edge cases.
 
-##### Technology Stack:
+#### Technology Stack:
 
 - React (with TypeScript): for building the UI.
 - Redux: for state management.
@@ -46,18 +46,18 @@ Develop a single-page application for managing articles, including listing artic
 - React Router: for navigation.
 - Jest + React Testing Library: for unit testing.
 
-##### API:
+#### API:
 
 Your application should interact with a backend to fetch and manipulate article data. You can choose between GraphQL or REST API.
 
-###### Option 1: REST API (JSONPlaceholder / Mock Server)
+##### Option 1: REST API (JSONPlaceholder / Mock Server)
 
 - GET /articles — fetch the list of articles
 - POST /articles — create a new article
 - PUT /articles/:id — update an existing article
 - DELETE /articles/:id — delete an article
 
-###### Option 2: GraphQL API (Mock or Apollo Server)
+##### Option 2: GraphQL API (Mock or Apollo Server)
 
 Implement GraphQL queries and mutations for:
 
@@ -67,7 +67,7 @@ Implement GraphQL queries and mutations for:
 - Updating an article
 - Deleting an article
 
-##### Evaluation Criteria:
+#### Evaluation Criteria:
 
 1. Code Readability and Cleanliness: Use of TypeScript, proper type definitions, and logical project structure.
 2. Performance Optimization: Avoid unnecessary re-renders and use memoization where needed.
@@ -77,7 +77,7 @@ Implement GraphQL queries and mutations for:
 6. Testing: Well-structured unit tests covering core components, verifying functionality, edge cases, and error handling.
 7. API Integration: Proper implementation of either REST or GraphQL with clear reasoning behind the chosen approach.
 
-##### Bonus Tasks (Optional):
+#### Bonus Tasks (Optional):
 
 - Implement search functionality for article titles.
 - Add sorting by publication date.

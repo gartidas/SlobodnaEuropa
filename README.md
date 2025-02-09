@@ -11,6 +11,10 @@ https://slobodna-europa.netlify.app/
 - Redux
 - Material UI
 - React Router
+- Vitest (Jest-like Vite alternative)
+- React Testing Library
+
+---
 
 ## Assignment:
 

@@ -78,7 +78,7 @@ const DetailTemplate = () => {
         flexDirection: "column",
         alignItems: "center",
         padding: isMobile ? "1rem 2rem" : "1rem 3rem",
-        minHeight: `calc(100vh - ${NAVBAR_HEIGHT}px - 4rem)`,
+        minHeight: `calc(100vh - ${NAVBAR_HEIGHT}px - 2rem)`,
       }}
     >
       <Stack

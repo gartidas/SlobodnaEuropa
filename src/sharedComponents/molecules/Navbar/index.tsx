@@ -4,11 +4,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router";
 import { NAVBAR_HEIGHT } from "../../../constants";
 
-interface INavbarProps {
-  onMenuOpen?: () => void;
-}
-
-const Navbar = ({ onMenuOpen }: INavbarProps) => {
+const Navbar = () => {
   const navigate = useNavigate();
   const navbarRef = React.useRef<HTMLDivElement | null>(null);
   const lastScrollY = React.useRef(0);
@@ -18,7 +14,7 @@ const Navbar = ({ onMenuOpen }: INavbarProps) => {
       const currentScrollY = window.scrollY;
 
       if (navbarRef.current) {
-        if (currentScrollY > lastScrollY.current && currentScrollY > 10) {
+        if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
           navbarRef.current.style.transform = "translateY(-100%)";
         } else {
           navbarRef.current.style.transform = "translateY(0)";
@@ -68,7 +64,6 @@ const Navbar = ({ onMenuOpen }: INavbarProps) => {
         </Typography>
 
         <IconButton
-          onClick={onMenuOpen}
           sx={{
             borderRadius: "999px",
             padding: "0.5rem 1.25rem",

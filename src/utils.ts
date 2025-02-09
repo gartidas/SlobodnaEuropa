@@ -1,6 +1,6 @@
 import { IArticle, IDomainPost } from "./model";
 
-export const getRandomDate = (yearsAgo = 5): string => {
+export const getRandomDate = (yearsAgo: number | undefined = 5): string => {
   const now = new Date();
   const past = new Date();
   past.setFullYear(now.getFullYear() - yearsAgo);

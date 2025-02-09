@@ -4,6 +4,9 @@ import axios from "axios";
 import { getRandomDate, mapDomainPostToArticle } from "../utils";
 import { fetchAuthorByAuthorId } from "./authorsSlice";
 
+// NOTE: Usually in env variables
+const ARTICLES_API_URL = "https://jsonplaceholder.typicode.com/posts/";
+
 interface IArticlesState {
   articles: IArticle[];
   selectedArticle?: IArticle;
@@ -24,9 +27,7 @@ export const fetchArticles = createAsyncThunk<IDomainPost[], void>(
   "articles/fetchArticles",
   async (_NEVER, { rejectWithValue }) => {
     try {
-      const postsResponse = await axios.get<IDomainPost[]>(
-        "https://jsonplaceholder.typicode.com/posts"
-      );
+      const postsResponse = await axios.get<IDomainPost[]>(ARTICLES_API_URL);
 
       return postsResponse.data.map((post) => {
         return { ...post, publicationDate: getRandomDate() };
@@ -42,7 +43,7 @@ export const fetchArticleById = createAsyncThunk<IDomainPost, string>(
   async (articleId, { dispatch, rejectWithValue }) => {
     try {
       const postResponse = await axios.get<IDomainPost>(
-        `https://jsonplaceholder.typicode.com/posts/${articleId}`
+        `${ARTICLES_API_URL}${articleId}`
       );
 
       const post = { ...postResponse.data, publicationDate: getRandomDate() };
@@ -59,10 +60,7 @@ export const createArticle = createAsyncThunk<IDomainPost, IDomainPost>(
   "articles/createArticle",
   async (post, { rejectWithValue }) => {
     try {
-      const response = await axios.post<IDomainPost>(
-        "https://jsonplaceholder.typicode.com/posts",
-        post
-      );
+      const response = await axios.post<IDomainPost>(ARTICLES_API_URL, post);
       return response.data;
     } catch (error) {
       return rejectWithValue(`Failed to create article: ${error}`);
@@ -75,7 +73,7 @@ export const updateArticle = createAsyncThunk<IDomainPost, IDomainPost>(
   async (post, { rejectWithValue }) => {
     try {
       const response = await axios.put<IDomainPost>(
-        `https://jsonplaceholder.typicode.com/posts/${post.id}`,
+        `${ARTICLES_API_URL}${post.id}`,
         post
       );
       return response.data;
@@ -89,9 +87,7 @@ export const deleteArticle = createAsyncThunk<string, string>(
   "articles/deleteArticle",
   async (articleId, { rejectWithValue }) => {
     try {
-      await axios.delete(
-        `https://jsonplaceholder.typicode.com/posts/${articleId}`
-      );
+      await axios.delete(`${ARTICLES_API_URL}${articleId}`);
       return articleId;
     } catch (error) {
       return rejectWithValue(`Failed to delete article: ${error}`);

@@ -2,6 +2,9 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { IAuthor } from "../model";
 
+// NOTE: Usually in env variables
+const AUTHORS_API_URL = "https://jsonplaceholder.typicode.com/users/";
+
 interface IAuthorsState {
   authors: IAuthor[];
   selectedAuthor?: IAuthor;
@@ -20,9 +23,7 @@ export const fetchAuthors = createAsyncThunk<IAuthor[], void>(
   "authors/fetchAuthors",
   async (_NEVER, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        "https://jsonplaceholder.typicode.com/users"
-      );
+      const response = await axios.get(AUTHORS_API_URL);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return response.data.map((user: any) => ({
@@ -39,9 +40,7 @@ export const fetchAuthorByAuthorId = createAsyncThunk<IAuthor, number>(
   "authors/fetchAuthorByAuthorId",
   async (authorId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `https://jsonplaceholder.typicode.com/users/${authorId}`
-      );
+      const response = await axios.get(`${AUTHORS_API_URL}${authorId}`);
 
       const user = response.data;
       return { id: user.id, name: user.name };

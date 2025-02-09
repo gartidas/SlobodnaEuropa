@@ -10,7 +10,7 @@ const BackToTopButton = () => {
   React.useEffect(() => {
     const toggleVisibility = () => {
       if (buttonRef.current) {
-        if (window.scrollY > 300) {
+        if (window.scrollY > 500) {
           buttonRef.current.style.opacity = "1";
           buttonRef.current.style.visibility = "visible";
         } else {

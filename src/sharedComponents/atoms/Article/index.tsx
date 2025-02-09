@@ -1,12 +1,14 @@
 import { Paper, Stack, Typography } from "@mui/material";
-import { IArticle } from "../../../model";
+import { IArticle, IAuthor } from "../../../model";
 import { useNavigate } from "react-router";
+import dayjs from "dayjs";
 
 interface IArticleProps {
   article: IArticle;
+  author?: IAuthor;
 }
 
-const Article = ({ article }: IArticleProps) => {
+const Article = ({ article, author }: IArticleProps) => {
   const navigate = useNavigate();
 
   return (
@@ -30,16 +32,18 @@ const Article = ({ article }: IArticleProps) => {
     >
       <Stack spacing="0.75rem">
         <Typography variant="subtitle2" color="text.secondary">
-          {article.publicationDate}
+          {dayjs(article.publicationDate).format("DD.MM.YYYY")}
         </Typography>
 
         <Typography variant="h5" fontWeight="bold">
-          {article.title.charAt(0).toUpperCase() + article.title.slice(1)}
+          {article.title}
         </Typography>
 
-        <Typography variant="body1" color="text.secondary">
-          by {article.author}
-        </Typography>
+        {author && (
+          <Typography variant="body1" color="text.secondary">
+            by {author.name}
+          </Typography>
+        )}
 
         <Typography
           variant="body2"
@@ -51,7 +55,7 @@ const Article = ({ article }: IArticleProps) => {
             textOverflow: "ellipsis",
           }}
         >
-          {article.content.charAt(0).toUpperCase() + article.content.slice(1)}
+          {article.content}
         </Typography>
       </Stack>
     </Paper>

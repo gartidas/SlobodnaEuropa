@@ -4,10 +4,23 @@ export type ReactFCC = React.FC<React.PropsWithChildren>;
 
 export type ReactFCCWithProps<T> = React.FC<React.PropsWithChildren<T>>;
 
+export interface IDomainPost {
+  id: number;
+  title: string;
+  body: string;
+  userId: number | null;
+  publicationDate: string;
+}
+
 export interface IArticle {
-  id: string;
+  id: number;
   title: string;
   content: string;
-  author?: string;
-  publicationDate?: string;
+  authorId: number;
+  publicationDate: string;
+}
+
+export interface IAuthor {
+  id: number;
+  name: string;
 }

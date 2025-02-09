@@ -1,14 +1,21 @@
 import { Box } from "@mui/material";
-import { ReactFCC } from "../../../model";
+import { ReactFCCWithProps } from "../../../model";
 import Navbar from "../Navbar";
 import BackToTopButton from "../../atoms/ReturnToStartButton";
 
-const DefaultLayout: ReactFCC = ({ children }) => {
+interface IDefaultLayoutProps {
+  isFabVisible?: boolean;
+}
+
+const DefaultLayout: ReactFCCWithProps<IDefaultLayoutProps> = ({
+  isFabVisible,
+  children,
+}) => {
   return (
     <Box>
       <Navbar />
       {children}
-      <BackToTopButton />
+      {isFabVisible && <BackToTopButton />}
     </Box>
   );
 };

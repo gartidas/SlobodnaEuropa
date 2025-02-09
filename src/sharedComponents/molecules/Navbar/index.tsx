@@ -62,7 +62,7 @@ const Navbar = ({ onMenuOpen }: INavbarProps) => {
             color: "#000",
             "&:hover": { opacity: 0.8 },
           }}
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/articles")}
         >
           Articles
         </Typography>

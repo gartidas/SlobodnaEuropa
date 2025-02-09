@@ -3,7 +3,7 @@ import ListingTemplate from "../../sharedComponents/templates/Listing";
 
 const ArticleListing = () => {
   return (
-    <DefaultLayout>
+    <DefaultLayout isFabVisible={true}>
       <ListingTemplate />
     </DefaultLayout>
   );

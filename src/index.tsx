@@ -5,14 +5,18 @@ import { Provider as ReduxProvider } from "react-redux";
 import { createTheme, ThemeProvider } from "@mui/material";
 import store from "./store";
 import GlobalStyles from "./GlobalStyles.tsx";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider theme={createTheme()}>
-      <ReduxProvider store={store}>
-        <GlobalStyles />
-        <App />
-      </ReduxProvider>
-    </ThemeProvider>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <ThemeProvider theme={createTheme()}>
+        <ReduxProvider store={store}>
+          <GlobalStyles />
+          <App />
+        </ReduxProvider>
+      </ThemeProvider>
+    </LocalizationProvider>
   </StrictMode>
 );

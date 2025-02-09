@@ -9,25 +9,39 @@ import {
   useMediaQuery,
   IconButton,
   Link,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { fetchArticleById } from "../../../store/articlesSlice";
+import { fetchArticleById, deleteArticle } from "../../../store/articlesSlice";
 import FullPageSpinner from "../../atoms/FullPageSpinner";
 import FullPageErrorMessage from "../../atoms/FullPageErrorMessage";
 import { NAVBAR_HEIGHT } from "../../../constants";
+import dayjs from "dayjs";
 
 const DetailTemplate = () => {
   const { articleId } = useParams();
   const navigate = useNavigate();
-  const { selectedArticle, loading, error } = useAppSelector(
-    (state) => state.articlesState
-  );
+  const {
+    selectedArticle,
+    loading: articlesLoading,
+    error: articlesError,
+  } = useAppSelector((state) => state.articlesState);
+  const {
+    selectedAuthor,
+    loading: authorLoading,
+    error: authorError,
+  } = useAppSelector((state) => state.authorsState);
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (articleId) {
@@ -35,9 +49,25 @@ const DetailTemplate = () => {
     }
   }, [dispatch, articleId]);
 
-  if (loading) return <FullPageSpinner />;
+  const handleDelete = () => {
+    if (articleId) {
+      dispatch(deleteArticle(articleId));
+      navigate("/articles#no-fetch=true");
+    }
+  };
 
-  if (error) return <FullPageErrorMessage errorMessage={error} />;
+  if (!selectedArticle || !selectedAuthor || articlesLoading || authorLoading)
+    return <FullPageSpinner />;
+
+  if (articlesError || authorError) {
+    return (
+      <FullPageErrorMessage
+        errorMessage={
+          articlesError || authorError || "An unknown error occurred"
+        }
+      />
+    );
+  }
 
   if (!selectedArticle) return null;
 
@@ -67,6 +97,7 @@ const DetailTemplate = () => {
             color: "inherit",
             fontWeight: "500",
             fontSize: "1rem",
+            alignSelf: "flex-end",
           }}
         >
           <ArrowBackIcon fontSize="small" />
@@ -79,36 +110,61 @@ const DetailTemplate = () => {
           justifyContent="space-between"
         >
           <Typography variant="subtitle2" color="text.secondary">
-            {selectedArticle.publicationDate}
+            {dayjs(selectedArticle.publicationDate).format("DD.MM.YYYY")}
           </Typography>
 
           <Stack direction="row" spacing={1}>
-            <IconButton sx={{ borderRadius: "50%" }}>
+            <IconButton
+              sx={{ borderRadius: "50%" }}
+              onClick={() => navigate(`/articles/${articleId}/edit`)}
+            >
               <EditIcon />
             </IconButton>
 
-            <IconButton sx={{ borderRadius: "50%", color: "error.main" }}>
+            <IconButton
+              sx={{ borderRadius: "50%", color: "error.main" }}
+              onClick={() => setIsDeleteModalOpen(true)}
+            >
               <DeleteIcon />
             </IconButton>
           </Stack>
         </Stack>
 
         <Typography variant={isMobile ? "h4" : "h3"} fontWeight="bold">
-          {selectedArticle.title.charAt(0).toUpperCase() +
-            selectedArticle.title.slice(1)}
+          {selectedArticle.title}
         </Typography>
 
-        <Typography variant="subtitle1" color="text.secondary">
-          by {selectedArticle.author}
-        </Typography>
+        {selectedAuthor && (
+          <Typography variant="subtitle1" color="text.secondary">
+            by {selectedAuthor.name}
+          </Typography>
+        )}
 
         <Divider />
 
         <Typography variant="body1" sx={{ lineHeight: 1.8 }}>
-          {selectedArticle.content.charAt(0).toUpperCase() +
-            selectedArticle.content.slice(1)}
+          {selectedArticle.content}
         </Typography>
       </Stack>
+
+      <Dialog
+        open={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+      >
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this article? This action cannot be
+          undone.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsDeleteModalOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

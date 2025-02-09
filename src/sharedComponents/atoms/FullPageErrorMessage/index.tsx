@@ -1,25 +1,65 @@
-import { Box, Paper, Typography } from "@mui/material";
+import {
+  Link,
+  Paper,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { NAVBAR_HEIGHT } from "../../../constants";
+import { useNavigate } from "react-router";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 interface IFullPageErrorMessageProps {
   errorMessage: string;
+  customFallback?: string;
 }
 
-const FullPageErrorMessage = ({ errorMessage }: IFullPageErrorMessageProps) => {
+const FullPageErrorMessage = ({
+  errorMessage,
+  customFallback,
+}: IFullPageErrorMessageProps) => {
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   return (
-    <Box
+    <Stack
+      direction="column"
       sx={{
-        display: "flex",
+        position: "relative",
         justifyContent: "center",
         alignItems: "center",
         height: `calc(100vh - ${NAVBAR_HEIGHT}px - 2rem)`,
         padding: "1rem",
       }}
     >
+      <Link
+        onClick={() => navigate(customFallback ?? "/articles")}
+        sx={{
+          position: "absolute",
+          top: "1rem",
+          right: "1rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          cursor: "pointer",
+          textDecoration: "none",
+          color: "inherit",
+          fontWeight: "500",
+          fontSize: "1rem",
+          alignSelf: "flex-end",
+          justifySelf: "flex-start",
+        }}
+      >
+        <ArrowBackIcon fontSize="small" />
+        Go back
+      </Link>
+
       <Paper
         elevation={3}
         sx={{
-          padding: "3rem 8rem",
+          padding: isMobile ? "1rem 2rem" : "3rem 8rem",
           borderRadius: "1rem",
           backgroundColor: "#ffebee",
           border: "2px solid #d32f2f",
@@ -46,7 +86,7 @@ const FullPageErrorMessage = ({ errorMessage }: IFullPageErrorMessageProps) => {
           {errorMessage}
         </Typography>
       </Paper>
-    </Box>
+    </Stack>
   );
 };
 

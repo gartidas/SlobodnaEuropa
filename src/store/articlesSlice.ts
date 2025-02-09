@@ -1,74 +1,101 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IArticle } from "../model";
+import { IArticle, IDomainPost } from "../model";
 import axios from "axios";
-import { getRandomDate } from "../utils";
+import { getRandomDate, mapDomainPostToArticle } from "../utils";
+import { fetchAuthorByAuthorId } from "./authorsSlice";
 
 interface IArticlesState {
   articles: IArticle[];
-  selectedArticle: IArticle | null;
+  selectedArticle?: IArticle;
+  pendingRollbackArticle?: IArticle;
   loading: boolean;
-  error: string | null;
+  error?: string;
 }
 
 const initialState: IArticlesState = {
   articles: [],
-  selectedArticle: null,
+  selectedArticle: undefined,
+  pendingRollbackArticle: undefined,
   loading: false,
-  error: null,
+  error: undefined,
 };
 
-export const fetchArticles = createAsyncThunk<IArticle[], void>(
+export const fetchArticles = createAsyncThunk<IDomainPost[], void>(
   "articles/fetchArticles",
-  async () => {
-    const postsResponse = await axios.get(
-      "https://jsonplaceholder.typicode.com/posts"
-    );
-    const posts = postsResponse.data;
+  async (_NEVER, { rejectWithValue }) => {
+    try {
+      const postsResponse = await axios.get<IDomainPost[]>(
+        "https://jsonplaceholder.typicode.com/posts"
+      );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userIds = [...new Set(posts.map((post: any) => post.userId))];
-
-    const usersResponse = await Promise.all(
-      userIds.map((id) =>
-        axios.get(`https://jsonplaceholder.typicode.com/users/${id}`)
-      )
-    );
-
-    const usersMap = usersResponse.reduce((acc, res) => {
-      acc[res.data.id] = res.data.name;
-      return acc;
-    }, {} as Record<number, string>);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return posts.map((post: any) => ({
-      id: post.id.toString(),
-      author: usersMap[post.userId] || undefined,
-      title: post.title,
-      publicationDate: getRandomDate(),
-      content: post.body,
-    }));
+      return postsResponse.data.map((post) => {
+        return { ...post, publicationDate: getRandomDate() };
+      });
+    } catch (error) {
+      return rejectWithValue(`Failed to fetch articles: ${error}`);
+    }
   }
 );
 
-export const fetchArticleById = createAsyncThunk<IArticle, string>(
+export const fetchArticleById = createAsyncThunk<IDomainPost, string>(
   "articles/fetchArticleById",
-  async (articleId) => {
-    const postResponse = await axios.get(
-      `https://jsonplaceholder.typicode.com/posts/${articleId}`
-    );
-    const post = postResponse.data;
+  async (articleId, { dispatch, rejectWithValue }) => {
+    try {
+      const postResponse = await axios.get<IDomainPost>(
+        `https://jsonplaceholder.typicode.com/posts/${articleId}`
+      );
 
-    const userResponse = await axios.get(
-      `https://jsonplaceholder.typicode.com/users/${post.userId}`
-    );
+      const post = { ...postResponse.data, publicationDate: getRandomDate() };
 
-    return {
-      id: post.id.toString(),
-      author: userResponse.data.name || undefined,
-      title: post.title,
-      publicationDate: getRandomDate(),
-      content: post.body,
-    };
+      dispatch(fetchAuthorByAuthorId(postResponse.data.userId!));
+      return post;
+    } catch (error) {
+      return rejectWithValue(`Failed to fetch article: ${error}`);
+    }
+  }
+);
+
+export const createArticle = createAsyncThunk<IDomainPost, IDomainPost>(
+  "articles/createArticle",
+  async (post, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<IDomainPost>(
+        "https://jsonplaceholder.typicode.com/posts",
+        post
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(`Failed to create article: ${error}`);
+    }
+  }
+);
+
+export const updateArticle = createAsyncThunk<IDomainPost, IDomainPost>(
+  "articles/updateArticle",
+  async (post, { rejectWithValue }) => {
+    try {
+      const response = await axios.put<IDomainPost>(
+        `https://jsonplaceholder.typicode.com/posts/${post.id}`,
+        post
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(`Failed to update article: ${error}`);
+    }
+  }
+);
+
+export const deleteArticle = createAsyncThunk<string, string>(
+  "articles/deleteArticle",
+  async (articleId, { rejectWithValue }) => {
+    try {
+      await axios.delete(
+        `https://jsonplaceholder.typicode.com/posts/${articleId}`
+      );
+      return articleId;
+    } catch (error) {
+      return rejectWithValue(`Failed to delete article: ${error}`);
+    }
   }
 );
 
@@ -76,59 +103,112 @@ export const articlesSlice = createSlice({
   name: "articles",
   initialState,
   reducers: {
-    createArticle(state, action: PayloadAction<IArticle>) {
-      state.articles.push(action.payload);
-    },
-    updateArticle(state, action: PayloadAction<IArticle>) {
-      const index = state.articles.findIndex(
-        (article) => article.id === action.payload.id
-      );
-      if (index !== -1) {
-        state.articles[index] = action.payload;
-      }
-    },
-    deleteArticle(state, action: PayloadAction<string>) {
-      state.articles = state.articles.filter(
-        (article) => article.id !== action.payload
-      );
+    clearSelectedArticle(state) {
+      state.selectedArticle = undefined;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchArticles.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = undefined;
       })
       .addCase(
         fetchArticles.fulfilled,
-        (state, action: PayloadAction<IArticle[]>) => {
+        (state, action: PayloadAction<IDomainPost[]>) => {
           state.loading = false;
-          state.articles = action.payload;
+          state.articles = action.payload.map((post) =>
+            mapDomainPostToArticle(post)
+          );
         }
       )
       .addCase(fetchArticles.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message ?? null;
+        state.error = action.error.message;
       })
       .addCase(fetchArticleById.pending, (state) => {
         state.loading = true;
-        state.error = null;
-        state.selectedArticle = null;
+        state.error = undefined;
+        state.selectedArticle = undefined;
       })
       .addCase(
         fetchArticleById.fulfilled,
-        (state, action: PayloadAction<IArticle>) => {
+        (state, action: PayloadAction<IDomainPost>) => {
           state.loading = false;
-          state.selectedArticle = action.payload;
+          state.selectedArticle = mapDomainPostToArticle(action.payload);
         }
       )
       .addCase(fetchArticleById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message ?? null;
-        state.selectedArticle = null;
+        state.error = action.error.message;
+        state.selectedArticle = undefined;
+      })
+      .addCase(createArticle.pending, (state, action) => {
+        const tempArticle = mapDomainPostToArticle(action.meta.arg);
+        state.articles = [tempArticle, ...state.articles];
+      })
+      .addCase(createArticle.fulfilled, (state, action) => {
+        const index = state.articles.findIndex(
+          (a) => a.id === action.meta.arg.id
+        );
+
+        if (index !== -1) {
+          state.articles[index] = mapDomainPostToArticle(action.payload);
+        }
+      })
+      .addCase(createArticle.rejected, (state, action) => {
+        state.articles = state.articles.filter(
+          (article) => article.id !== action.meta.arg.id
+        );
+        state.error = action.payload as string;
+      })
+      .addCase(updateArticle.pending, (state, action) => {
+        const updatedArticle = mapDomainPostToArticle(action.meta.arg);
+        const index = state.articles.findIndex(
+          (a) => a.id === updatedArticle.id
+        );
+
+        if (index !== -1) {
+          state.pendingRollbackArticle = state.articles[index];
+
+          state.articles[index] = updatedArticle;
+        }
+      })
+      .addCase(updateArticle.fulfilled, (state, action) => {
+        const updatedArticle = mapDomainPostToArticle(action.payload);
+        const index = state.articles.findIndex(
+          (a) => a.id === updatedArticle.id
+        );
+
+        if (index !== -1) {
+          state.articles[index] = updatedArticle;
+        }
+
+        state.pendingRollbackArticle = undefined;
+      })
+      .addCase(updateArticle.rejected, (state) => {
+        if (state.pendingRollbackArticle) {
+          const rollbackArticle = state.pendingRollbackArticle;
+          const index = state.articles.findIndex(
+            (a) => a.id === rollbackArticle.id
+          );
+
+          if (index !== -1) {
+            state.articles[index] = rollbackArticle;
+          }
+        }
+
+        state.pendingRollbackArticle = undefined;
+      })
+      .addCase(deleteArticle.pending, (state, action) => {
+        state.articles = state.articles.filter(
+          (article) => article.id !== Number.parseInt(action.meta.arg)
+        );
+      })
+      .addCase(deleteArticle.rejected, (state, action) => {
+        state.error = action.payload as string;
       });
   },
 });
 
-export const { createArticle, updateArticle, deleteArticle } =
-  articlesSlice.actions;
+export const { clearSelectedArticle } = articlesSlice.actions;

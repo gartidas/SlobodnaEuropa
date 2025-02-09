@@ -31,6 +31,7 @@ const Navbar = () => {
 
   return (
     <AppBar
+      data-testid="navbar"
       position="sticky"
       ref={navbarRef}
       sx={{

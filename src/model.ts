@@ -24,3 +24,18 @@ export interface IAuthor {
   id: number;
   name: string;
 }
+
+export interface IAuthorsState {
+  authors: IAuthor[];
+  selectedAuthor?: IAuthor;
+  loading: boolean;
+  error?: string;
+}
+
+export interface IArticlesState {
+  articles: IArticle[];
+  selectedArticle?: IArticle;
+  pendingRollbackArticle?: IArticle;
+  loading: boolean;
+  error?: string;
+}

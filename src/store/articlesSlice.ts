@@ -1,19 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IArticle, IDomainPost } from "../model";
+import { IArticlesState, IDomainPost } from "../model";
 import axios from "axios";
 import { getRandomDate, mapDomainPostToArticle } from "../utils";
 import { fetchAuthorByAuthorId } from "./authorsSlice";
 
 // NOTE: Usually in env variables
 const ARTICLES_API_URL = "https://jsonplaceholder.typicode.com/posts/";
-
-interface IArticlesState {
-  articles: IArticle[];
-  selectedArticle?: IArticle;
-  pendingRollbackArticle?: IArticle;
-  loading: boolean;
-  error?: string;
-}
 
 const initialState: IArticlesState = {
   articles: [],
@@ -208,3 +200,5 @@ export const articlesSlice = createSlice({
 });
 
 export const { clearSelectedArticle } = articlesSlice.actions;
+
+export default articlesSlice.reducer;

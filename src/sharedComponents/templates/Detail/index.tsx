@@ -122,6 +122,7 @@ const DetailTemplate = () => {
             </IconButton>
 
             <IconButton
+              data-testid="delete-button"
               sx={{ borderRadius: "50%", color: "error.main" }}
               onClick={() => setIsDeleteModalOpen(true)}
             >

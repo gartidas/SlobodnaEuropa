@@ -4,6 +4,7 @@ import { NAVBAR_HEIGHT } from "../../../constants";
 const FullPageSpinner = () => {
   return (
     <Box
+      data-testid="full-page-spinner"
       sx={{
         display: "flex",
         justifyContent: "center",

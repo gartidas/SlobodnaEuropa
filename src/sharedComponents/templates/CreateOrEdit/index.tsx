@@ -38,6 +38,7 @@ const CreateOrEditTemplate = ({
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isEdit = !!selectedArticle?.id;
 
   const { control, handleSubmit } = useForm<IDomainPost>({
     defaultValues: {
@@ -49,7 +50,7 @@ const CreateOrEditTemplate = ({
   });
 
   const onSubmit = (data: IDomainPost) => {
-    if (selectedArticle) {
+    if (isEdit) {
       dispatch(updateArticle({ ...data, id: selectedArticle.id }));
     } else {
       dispatch(createArticle(data));
@@ -60,6 +61,7 @@ const CreateOrEditTemplate = ({
 
   return (
     <Box
+      data-testid="create-or-edit-template"
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -71,7 +73,7 @@ const CreateOrEditTemplate = ({
       <Stack spacing={3} width="100%" maxWidth={isMobile ? "100%" : "60rem"}>
         <Link
           onClick={() => {
-            navigate(`/articles${selectedArticle && `/${selectedArticle.id}`}`);
+            navigate(`/articles${isEdit && `/${selectedArticle.id}`}`);
           }}
           sx={{
             display: "flex",
@@ -86,11 +88,11 @@ const CreateOrEditTemplate = ({
           }}
         >
           <ArrowBackIcon fontSize="small" />
-          Back to Article{!selectedArticle && "s"}
+          Back to Article{!isEdit && "s"}
         </Link>
 
         <Typography variant={isMobile ? "h4" : "h3"} fontWeight="bold">
-          {selectedArticle ? "Edit Article" : "Create New Article"}
+          {isEdit ? "Edit Article" : "Create New Article"}
         </Typography>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -180,11 +182,12 @@ const CreateOrEditTemplate = ({
             />
 
             <Button
+              data-testid="submit-button"
               type="submit"
               variant="contained"
               sx={{ alignSelf: "flex-start" }}
             >
-              {selectedArticle ? "Update Article" : "Create Article"}
+              {isEdit ? "Update Article" : "Create Article"}
             </Button>
           </Stack>
         </form>

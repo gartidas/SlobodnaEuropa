@@ -31,6 +31,7 @@ const BackToTopButton = () => {
 
   return (
     <Fab
+      data-testid="back-to-top-button"
       ref={buttonRef}
       color="primary"
       size="medium"

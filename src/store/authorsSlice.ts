@@ -1,16 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-import { IAuthor } from "../model";
+import { IAuthor, IAuthorsState } from "../model";
 
 // NOTE: Usually in env variables
 const AUTHORS_API_URL = "https://jsonplaceholder.typicode.com/users/";
-
-interface IAuthorsState {
-  authors: IAuthor[];
-  selectedAuthor?: IAuthor;
-  loading: boolean;
-  error?: string;
-}
 
 const initialState: IAuthorsState = {
   authors: [],
@@ -96,3 +89,5 @@ export const authorsSlice = createSlice({
 });
 
 export const { clearSelectedAuthor } = authorsSlice.actions;
+
+export default authorsSlice.reducer;

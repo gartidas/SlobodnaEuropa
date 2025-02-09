@@ -1,5 +1,16 @@
 import * as React from "react";
-import { Box, Stack, TextField, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  Stack,
+  TextField,
+  useMediaQuery,
+  useTheme,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  SelectChangeEvent,
+} from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import {
   clearSelectedArticle,
@@ -21,6 +32,7 @@ const ListingTemplate = () => {
   const { hash, search } = useLocation();
   const searchParams = new URLSearchParams(search);
   const searchValue = searchParams.get("q") || "";
+  const sortOrder = searchParams.get("sort") || "default";
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const {
@@ -36,10 +48,25 @@ const ListingTemplate = () => {
   const dispatch = useAppDispatch();
 
   const handleSearchChange = useDebounce((value) => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams);
     if (value.trim()) params.set("q", value);
+    else params.delete("q");
+
     navigate(`/articles?${params.toString()}`, { replace: true });
   }, 300);
+
+  const handleSortChange = (event: SelectChangeEvent<string>) => {
+    const params = new URLSearchParams(searchParams);
+    const selectedSort = event.target.value as string;
+
+    if (selectedSort === "default") {
+      params.delete("sort");
+    } else {
+      params.set("sort", selectedSort);
+    }
+
+    navigate(`/articles?${params.toString()}`, { replace: true });
+  };
 
   const filterBySearchValue = (article: IArticle) => {
     if (!searchValue) return true;
@@ -55,6 +82,34 @@ const ListingTemplate = () => {
         .includes(lowerSearch) ||
       (author && author.name.toLowerCase().includes(lowerSearch))
     );
+  };
+
+  const sortArticles = (a: IArticle, b: IArticle) => {
+    if (sortOrder === "default") return 0;
+
+    const authorA =
+      authors.find((author) => author.id === a.authorId)?.name || "";
+    const authorB =
+      authors.find((author) => author.id === b.authorId)?.name || "";
+
+    switch (sortOrder) {
+      case "alpha-asc":
+        return authorA.localeCompare(authorB) || a.title.localeCompare(b.title);
+      case "alpha-desc":
+        return authorB.localeCompare(authorA) || b.title.localeCompare(a.title);
+      case "chron-asc":
+        return (
+          dayjs(a.publicationDate).valueOf() -
+          dayjs(b.publicationDate).valueOf()
+        );
+      case "chron-desc":
+        return (
+          dayjs(b.publicationDate).valueOf() -
+          dayjs(a.publicationDate).valueOf()
+        );
+      default:
+        return 0;
+    }
   };
 
   React.useEffect(() => {
@@ -95,16 +150,42 @@ const ListingTemplate = () => {
         minHeight: `calc(100vh - ${NAVBAR_HEIGHT}px - 4rem)`,
       }}
     >
-      <TextField
-        fullWidth
-        label="Search articles..."
-        variant="outlined"
-        defaultValue={searchValue}
+      <Stack
+        direction="row"
+        gap="1.5rem"
         sx={{
-          maxWidth: isMobile ? "100%" : "60%",
+          width: "100%",
+          maxWidth: "80%",
+          justifyContent: "center",
+          flexWrap: "wrap",
         }}
-        onChange={(e) => handleSearchChange(e.target.value)}
-      />
+      >
+        <TextField
+          label="Search articles..."
+          variant="outlined"
+          defaultValue={searchValue}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          sx={{
+            minWidth: "18.75rem",
+            width: "60%",
+          }}
+        />
+
+        <FormControl sx={{ minWidth: "fit-content" }}>
+          <InputLabel>Sort by</InputLabel>
+          <Select value={sortOrder} onChange={handleSortChange} label="Sort by">
+            <MenuItem value="default">Default (None)</MenuItem>
+            <MenuItem value="alpha-asc">Alphabetically (A → Z)</MenuItem>
+            <MenuItem value="alpha-desc">Alphabetically (Z → A)</MenuItem>
+            <MenuItem value="chron-asc">
+              Chronologically (Oldest → Newest)
+            </MenuItem>
+            <MenuItem value="chron-desc">
+              Chronologically (Newest → Oldest)
+            </MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
 
       <Box
         sx={{
@@ -118,18 +199,21 @@ const ListingTemplate = () => {
       >
         <AddNewArticleButton
           key="add"
-          onClick={() => {
-            navigate("/articles/create");
-          }}
+          onClick={() => navigate("/articles/create")}
         />
 
-        {articles.filter(filterBySearchValue).map((article) => {
-          const author = authors.find(
-            (author) => author.id === article.authorId
-          );
+        {articles
+          .filter(filterBySearchValue)
+          .sort(sortArticles)
+          .map((article) => {
+            const author = authors.find(
+              (author) => author.id === article.authorId
+            );
 
-          return <Article key={article.id} article={article} author={author} />;
-        })}
+            return (
+              <Article key={article.id} article={article} author={author} />
+            );
+          })}
       </Box>
     </Stack>
   );

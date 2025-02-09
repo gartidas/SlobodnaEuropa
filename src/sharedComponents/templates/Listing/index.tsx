@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Stack, TextField, useMediaQuery, useTheme } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import {
   clearSelectedArticle,
@@ -12,10 +12,15 @@ import { NAVBAR_HEIGHT } from "../../../constants";
 import AddNewArticleButton from "../../atoms/AddNewArticleButton";
 import { useLocation, useNavigate } from "react-router";
 import { clearSelectedAuthor, fetchAuthors } from "../../../store/authorsSlice";
+import useDebounce from "../../../hooks/useDebounce";
+import { IArticle } from "../../../model";
+import dayjs from "dayjs";
 
 const ListingTemplate = () => {
   const navigate = useNavigate();
-  const { hash } = useLocation();
+  const { hash, search } = useLocation();
+  const searchParams = new URLSearchParams(search);
+  const searchValue = searchParams.get("q") || "";
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const {
@@ -29,6 +34,28 @@ const ListingTemplate = () => {
     error: authorsError,
   } = useAppSelector((state) => state.authorsState);
   const dispatch = useAppDispatch();
+
+  const handleSearchChange = useDebounce((value) => {
+    const params = new URLSearchParams();
+    if (value.trim()) params.set("q", value);
+    navigate(`/articles?${params.toString()}`, { replace: true });
+  }, 300);
+
+  const filterBySearchValue = (article: IArticle) => {
+    if (!searchValue) return true;
+
+    const author = authors.find((a) => a.id === article.authorId);
+    const lowerSearch = searchValue.toLowerCase();
+
+    return (
+      article.title.toLowerCase().includes(lowerSearch) ||
+      article.content.toLowerCase().includes(lowerSearch) ||
+      dayjs(article.publicationDate)
+        .format("DD.MM.YYYY")
+        .includes(lowerSearch) ||
+      (author && author.name.toLowerCase().includes(lowerSearch))
+    );
+  };
 
   React.useEffect(() => {
     if (hash === "") {
@@ -59,29 +86,52 @@ const ListingTemplate = () => {
   }
 
   return (
-    <Box
+    <Stack
+      direction="column"
       sx={{
-        display: "flex",
-        flexWrap: "wrap",
+        alignItems: "center",
         gap: "1.5rem",
-        justifyContent: "center",
         padding: isMobile ? "2rem" : "2rem 10rem",
         minHeight: `calc(100vh - ${NAVBAR_HEIGHT}px - 4rem)`,
       }}
     >
-      <AddNewArticleButton
-        key="add"
-        onClick={() => {
-          navigate("/articles/create");
+      <TextField
+        fullWidth
+        label="Search articles..."
+        variant="outlined"
+        defaultValue={searchValue}
+        sx={{
+          maxWidth: isMobile ? "100%" : "60%",
         }}
+        onChange={(e) => handleSearchChange(e.target.value)}
       />
 
-      {articles.map((article) => {
-        const author = authors.find((author) => author.id === article.authorId);
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "1.5rem",
+          padding: isMobile ? "0 2rem" : "0 10rem",
+          maxWidth: "100%",
+          justifyContent: "center",
+        }}
+      >
+        <AddNewArticleButton
+          key="add"
+          onClick={() => {
+            navigate("/articles/create");
+          }}
+        />
 
-        return <Article key={article.id} article={article} author={author} />;
-      })}
-    </Box>
+        {articles.filter(filterBySearchValue).map((article) => {
+          const author = authors.find(
+            (author) => author.id === article.authorId
+          );
+
+          return <Article key={article.id} article={article} author={author} />;
+        })}
+      </Box>
+    </Stack>
   );
 };
 

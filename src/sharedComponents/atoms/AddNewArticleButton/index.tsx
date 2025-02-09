@@ -11,7 +11,7 @@ const AddNewArticleButton = ({ onClick }: IAddNewArticleButtonProps) => {
       elevation={3}
       sx={{
         width: "20rem",
-        minHeight: "8rem",
+        minHeight: "16rem",
         padding: "1.5rem",
         display: "flex",
         justifyContent: "center",

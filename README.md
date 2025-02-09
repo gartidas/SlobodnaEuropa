@@ -2,7 +2,7 @@
 
 ## Live demo:
 
-https://material-ui.com/components/timeline/
+https://slobodna-europa.netlify.app/
 
 ## Tech stack:
 

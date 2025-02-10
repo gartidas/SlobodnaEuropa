@@ -41,6 +41,7 @@ export const fetchArticleById = createAsyncThunk<IDomainPost, string>(
       const post = { ...postResponse.data, publicationDate: getRandomDate() };
 
       dispatch(fetchAuthorByAuthorId(postResponse.data.userId!));
+
       return post;
     } catch (error) {
       return rejectWithValue(`Failed to fetch article: ${error}`);
@@ -53,6 +54,7 @@ export const createArticle = createAsyncThunk<IDomainPost, IDomainPost>(
   async (post, { rejectWithValue }) => {
     try {
       const response = await axios.post<IDomainPost>(ARTICLES_API_URL, post);
+
       return response.data;
     } catch (error) {
       return rejectWithValue(`Failed to create article: ${error}`);
@@ -68,6 +70,7 @@ export const updateArticle = createAsyncThunk<IDomainPost, IDomainPost>(
         `${ARTICLES_API_URL}${post.id}`,
         post
       );
+
       return response.data;
     } catch (error) {
       return rejectWithValue(`Failed to update article: ${error}`);
@@ -80,6 +83,7 @@ export const deleteArticle = createAsyncThunk<string, string>(
   async (articleId, { rejectWithValue }) => {
     try {
       await axios.delete(`${ARTICLES_API_URL}${articleId}`);
+
       return articleId;
     } catch (error) {
       return rejectWithValue(`Failed to delete article: ${error}`);

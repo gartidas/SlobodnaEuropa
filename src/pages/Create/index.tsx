@@ -14,10 +14,6 @@ const CreateArticle = () => {
   } = useAppSelector((state) => state.authorsState);
   const dispatch = useAppDispatch();
 
-  React.useEffect(() => {
-    dispatch(fetchAuthors());
-  }, [dispatch]);
-
   const getCreatePageContent = () => {
     if (authorError) {
       return (
@@ -32,6 +28,10 @@ const CreateArticle = () => {
 
     return <CreateOrEditTemplate authors={authors} />;
   };
+
+  React.useEffect(() => {
+    dispatch(fetchAuthors());
+  }, [dispatch]);
 
   return <DefaultLayout>{getCreatePageContent()}</DefaultLayout>;
 };

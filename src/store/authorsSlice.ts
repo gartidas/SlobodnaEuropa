@@ -34,8 +34,8 @@ export const fetchAuthorByAuthorId = createAsyncThunk<IAuthor, number>(
   async (authorId, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${AUTHORS_API_URL}${authorId}`);
-
       const user = response.data;
+
       return { id: user.id, name: user.name };
     } catch (error) {
       return rejectWithValue(`Failed to fetch authors: ${error}`);

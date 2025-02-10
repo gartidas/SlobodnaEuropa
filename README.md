@@ -8,6 +8,7 @@ https://slobodna-europa.netlify.app/
 
 - React
 - TypeScript
+- Vite
 - Redux
 - Material UI
 - React Router

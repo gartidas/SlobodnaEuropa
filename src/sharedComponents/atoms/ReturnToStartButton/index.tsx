@@ -7,6 +7,10 @@ const BackToTopButton = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   React.useEffect(() => {
     const toggleVisibility = () => {
       if (buttonRef.current) {
@@ -24,10 +28,6 @@ const BackToTopButton = () => {
 
     return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   return (
     <Fab

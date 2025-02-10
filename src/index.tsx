@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import * as React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import { Provider as ReduxProvider } from "react-redux";
@@ -9,7 +9,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  <React.StrictMode>
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <ThemeProvider theme={createTheme()}>
         <ReduxProvider store={store}>
@@ -18,5 +18,5 @@ createRoot(document.getElementById("root")!).render(
         </ReduxProvider>
       </ThemeProvider>
     </LocalizationProvider>
-  </StrictMode>
+  </React.StrictMode>
 );

@@ -127,9 +127,6 @@ const ListingTemplate = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, navigate]);
 
-  if (!authors || !articles || articlesLoading || authorsLoading)
-    return <FullPageSpinner />;
-
   if (articlesError || authorsError) {
     return (
       <FullPageErrorMessage
@@ -139,6 +136,9 @@ const ListingTemplate = () => {
       />
     );
   }
+
+  if (!authors || !articles || articlesLoading || authorsLoading)
+    return <FullPageSpinner />;
 
   return (
     <Stack
@@ -173,13 +173,18 @@ const ListingTemplate = () => {
 
         <FormControl sx={{ minWidth: "fit-content" }}>
           <InputLabel>Sort by</InputLabel>
+
           <Select value={sortOrder} onChange={handleSortChange} label="Sort by">
             <MenuItem value="default">Default (None)</MenuItem>
+
             <MenuItem value="alpha-asc">Alphabetically (A → Z)</MenuItem>
+
             <MenuItem value="alpha-desc">Alphabetically (Z → A)</MenuItem>
+
             <MenuItem value="chron-asc">
               Chronologically (Oldest → Newest)
             </MenuItem>
+
             <MenuItem value="chron-desc">
               Chronologically (Newest → Oldest)
             </MenuItem>

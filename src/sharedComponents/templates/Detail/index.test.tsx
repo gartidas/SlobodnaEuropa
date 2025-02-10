@@ -65,15 +65,8 @@ describe("DetailTemplate Component", () => {
       {
         error: "Article error",
         loading: false,
-        selectedArticle: {
-          id: 123,
-          title: "Test Article",
-          content: "Sample content",
-          authorId: 1,
-          publicationDate: "2024-02-09",
-        },
       },
-      { loading: false, selectedAuthor: { id: 1, name: "Author" } }
+      { loading: false }
     );
     expect(screen.getByText("Article error")).toBeInTheDocument();
   });

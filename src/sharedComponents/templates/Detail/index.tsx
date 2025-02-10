@@ -43,12 +43,6 @@ const DetailTemplate = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
 
-  React.useEffect(() => {
-    if (articleId) {
-      dispatch(fetchArticleById(articleId));
-    }
-  }, [dispatch, articleId]);
-
   const handleDelete = () => {
     if (articleId) {
       dispatch(deleteArticle(articleId));
@@ -56,8 +50,11 @@ const DetailTemplate = () => {
     }
   };
 
-  if (!selectedArticle || !selectedAuthor || articlesLoading || authorLoading)
-    return <FullPageSpinner />;
+  React.useEffect(() => {
+    if (articleId) {
+      dispatch(fetchArticleById(articleId));
+    }
+  }, [dispatch, articleId]);
 
   if (articlesError || authorError) {
     return (
@@ -69,7 +66,8 @@ const DetailTemplate = () => {
     );
   }
 
-  if (!selectedArticle) return null;
+  if (!selectedArticle || !selectedAuthor || articlesLoading || authorLoading)
+    return <FullPageSpinner />;
 
   return (
     <Box
@@ -153,14 +151,17 @@ const DetailTemplate = () => {
         onClose={() => setIsDeleteModalOpen(false)}
       >
         <DialogTitle>Confirm Deletion</DialogTitle>
+
         <DialogContent>
           Are you sure you want to delete this article? This action cannot be
           undone.
         </DialogContent>
+
         <DialogActions>
           <Button onClick={() => setIsDeleteModalOpen(false)} color="primary">
             Cancel
           </Button>
+
           <Button onClick={handleDelete} color="error" variant="contained">
             Delete
           </Button>

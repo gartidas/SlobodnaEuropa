@@ -23,16 +23,6 @@ const EditArticle = () => {
   } = useAppSelector((state) => state.authorsState);
   const dispatch = useAppDispatch();
 
-  React.useEffect(() => {
-    dispatch(fetchAuthors());
-  }, [dispatch]);
-
-  React.useEffect(() => {
-    if (articleId) {
-      dispatch(fetchArticleById(articleId));
-    }
-  }, [articleId, dispatch]);
-
   const getEditPageContent = () => {
     if (articlesError || authorError) {
       return (
@@ -62,6 +52,16 @@ const EditArticle = () => {
       />
     );
   };
+
+  React.useEffect(() => {
+    dispatch(fetchAuthors());
+  }, [dispatch]);
+
+  React.useEffect(() => {
+    if (articleId) {
+      dispatch(fetchArticleById(articleId));
+    }
+  }, [articleId, dispatch]);
 
   return <DefaultLayout>{getEditPageContent()}</DefaultLayout>;
 };
